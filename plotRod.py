@@ -36,12 +36,18 @@ def plotRod(self, field=None, theta_initial=None):
             yc = 0.5 * (y0[i] + y0[i + 1])
 
             phi = theta_initial[i] + self.alpha0[i]
+
             mx = np.cos(phi)
             my = np.sin(phi)
 
+            Mscale = self.M[i]
+
+            if np.max(np.abs(self.M)) > 0:
+                Mscale /= np.max(np.abs(self.M))
+
             ax.arrow(xc, yc,
-                     0.10 * self.length * mx,
-                     0.10 * self.length * my,
+                     0.10 * self.length * Mscale * mx,
+                     0.10 * self.length * Mscale * my,
                      color='lightcoral',
                      alpha=0.6,
                      width=0.0003 * self.length,
@@ -65,9 +71,12 @@ def plotRod(self, field=None, theta_initial=None):
         mx = np.cos(phi)
         my = np.sin(phi)
 
-        ax.arrow(xc, yc,
-                 scale * mx,
-                 scale * my,
+        Mscale = self.M[i]
+
+        if np.max(np.abs(self.M)) > 0:
+            Mscale /= np.max(np.abs(self.M))
+
+        ax.arrow(xc, yc, scale * Mscale * mx, scale * Mscale * my,
                  color='red',
                  width=0.0006 * self.length,
                  head_width=0.010 * self.length,

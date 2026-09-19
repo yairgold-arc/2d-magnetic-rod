@@ -133,15 +133,6 @@ class RodGUI:
 
         elif profile == "Sinusoid":
 
-            tk.Label(self.profile_frame, text="Max. Amplitude [deg]").grid(
-                row=0, column=0, padx=10, pady=5)
-
-            self.sin_amp_var = tk.StringVar(value="90")
-
-            tk.Entry(self.profile_frame, textvariable=self.sin_amp_var,
-                     justify="center", width=12).grid(
-                row=0, column=1, padx=10, pady=5)
-
             tk.Label(self.profile_frame, text="Periods").grid(
                 row=1, column=0, padx=10, pady=5)
 
@@ -167,10 +158,7 @@ class RodGUI:
             return turns * 2 * np.pi * s
 
         if profile == "Sinusoid":
-            amp = float(self.sin_amp_var.get())
-            waves = float(self.sin_waves_var.get())
-            s = np.linspace(0, 1, nseg - 1)
-            return np.deg2rad(amp) * np.sin(2 * np.pi * waves * s)
+            return np.pi / 2 * np.ones(nseg - 1)
 
         return np.zeros(nseg - 1)
 
@@ -191,6 +179,16 @@ class RodGUI:
                             area=area, magnetization=magnetization)
 
         rod.alpha0[:] = self.build_alpha(profile, nseg)
+
+        rod.M[:] = magnetization
+
+        if profile == "Sinusoid":
+
+            periods = float(self.sin_waves_var.get())
+
+            s = (np.arange(nseg - 1) + 0.5)/(nseg - 1)
+
+            rod.M[:] = magnetization * np.sin(2*np.pi*periods*s)
 
         field = MagneticField2D(B0=np.array([bx, by]))
 
