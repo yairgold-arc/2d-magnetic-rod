@@ -1,10 +1,12 @@
 from MagneticField2D import MagneticField2D
 from MagneticRod2D import MagneticRod2D
+from ToolTip import ToolTip
 
 import tkinter as tk
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+
 
 matplotlib.use("TkAgg")
 
@@ -23,60 +25,75 @@ class RodGUI:
         title_font = ("Arial", 16, "bold")
         button_font = ("Arial", 14, "bold")
 
-        tk.Label(root, text="Rod Parameters", font=title_font).grid(
-            row=0, column=0, columnspan=2, sticky="w", pady=(0, 15))
+        title = tk.Label(root, text="Rod Parameters", font=title_font)
 
-        tk.Label(root, text="Length [m]", font=label_font).grid(
-            row=1, column=0, sticky="w", padx=10, pady=5)
+        title.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 15))
+
+        length_label = tk.Label(root, text="Length [m]", font=label_font)
+        length_label.grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        ToolTip(length_label, "Total rod length in meters.")
+
         self.length_var = tk.StringVar(value="0.1")
         tk.Entry(root, textvariable=self.length_var, font=entry_font,
-                 justify="center",
-                 width=12).grid(row=1, column=1, padx=10, pady=5)
+                 justify="center", width=12).grid(row=1, column=1, padx=10, pady=5)
 
-        tk.Label(root, text="Num. Seg.", font=label_font).grid(
-            row=2, column=0, sticky="w", padx=10, pady=5)
+        nseg_label = tk.Label(root, text="Num. Seg.", font=label_font)
+        nseg_label.grid(row=2, column=0, sticky="w", padx=10, pady=5)
+        ToolTip(nseg_label,
+                "Number of rod segments.\nHigher values improve accuracy but increase solve time.")
+
         self.nseg_var = tk.StringVar(value="31")
         tk.Entry(root, textvariable=self.nseg_var, font=entry_font,
-                 justify="center",
-                 width=12).grid(row=2, column=1, padx=10, pady=5)
+                 justify="center", width=12).grid(row=2, column=1, padx=10, pady=5)
 
-        tk.Label(root, text="E x I [N·m²]", font=label_font).grid(
-            row=3, column=0, sticky="w", padx=10, pady=5)
+        ei_label = tk.Label(root, text="E x I [N·m²]", font=label_font)
+        ei_label.grid(row=3, column=0, sticky="w", padx=10, pady=5)
+        ToolTip(ei_label,
+                "Rod bending stiffness.\nLarger values produce a stiffer rod.")
+
         self.ei_var = tk.StringVar(value="1e-6")
         tk.Entry(root, textvariable=self.ei_var, font=entry_font,
-                 justify="center",
-                 width=12).grid(row=3, column=1, padx=10, pady=5)
+                 justify="center", width=12).grid(row=3, column=1, padx=10, pady=5)
 
-        tk.Label(root, text="Area [m²]", font=label_font).grid(
-            row=4, column=0, sticky="w", padx=10, pady=5)
+        area_label = tk.Label(root, text="Area [m²]", font=label_font)
+        area_label.grid(row=4, column=0, sticky="w", padx=10, pady=5)
+        ToolTip(area_label,
+                "Cross-sectional area.\nUsed when calculating magnetic energy.")
+
         self.area_var = tk.StringVar(value="1e-6")
         tk.Entry(root, textvariable=self.area_var, font=entry_font,
-                 justify="center",
-                 width=12).grid(row=4, column=1, padx=10, pady=5)
+                 justify="center", width=12).grid(row=4, column=1, padx=10, pady=5)
 
-        tk.Label(root, text="Magnetization [A/m]", font=label_font).grid(
-            row=5, column=0, sticky="w", padx=10, pady=5)
+        mag_label = tk.Label(root, text="Magnetization [A/m]", font=label_font)
+        mag_label.grid(row=5, column=0, sticky="w", padx=10, pady=5)
+        ToolTip(mag_label,
+                "Magnetization amplitude M.\nFor sinusoidal profiles this is the peak value.")
+
         self.mag_var = tk.StringVar(value="1e5")
         tk.Entry(root, textvariable=self.mag_var, font=entry_font,
-                 justify="center",
-                 width=12).grid(row=5, column=1, padx=10, pady=5)
+                 justify="center", width=12).grid(row=5, column=1, padx=10, pady=5)
 
-        tk.Label(root, text="External Field", font=title_font).grid(
-            row=6, column=0, columnspan=2, sticky="w", pady=(20, 15))
+        field_title = tk.Label(root, text="External Field", font=title_font)
+        field_title.grid(row=6, column=0, columnspan=2,
+                         sticky="w", pady=(20, 15))
 
-        tk.Label(root, text="Bx [T]", font=label_font).grid(
-            row=7, column=0, sticky="w", padx=10, pady=5)
+        bx_label = tk.Label(root, text="Bx [T]", font=label_font)
+        bx_label.grid(row=7, column=0, sticky="w", padx=10, pady=5)
+        ToolTip(bx_label,
+                "Magnetic field X component in Tesla.")
+
         self.bx_var = tk.StringVar(value="0.01")
         tk.Entry(root, textvariable=self.bx_var, font=entry_font,
-                 justify="center",
-                 width=12).grid(row=7, column=1, padx=10, pady=5)
+                 justify="center", width=12).grid(row=7, column=1, padx=10, pady=5)
 
-        tk.Label(root, text="By [T]", font=label_font).grid(
-            row=8, column=0, sticky="w", padx=10, pady=5)
+        by_label = tk.Label(root, text="By [T]", font=label_font)
+        by_label.grid(row=8, column=0, sticky="w", padx=10, pady=5)
+        ToolTip(by_label,
+                "Magnetic field Y component in Tesla.")
+
         self.by_var = tk.StringVar(value="0.01")
         tk.Entry(root, textvariable=self.by_var, font=entry_font,
-                 justify="center",
-                 width=12).grid(row=8, column=1, padx=10, pady=5)
+                 justify="center", width=12).grid(row=8, column=1, padx=10, pady=5)
 
         tk.Label(root, text="Magnetization Profile", font=title_font).grid(
             row=9, column=0, columnspan=2, sticky="w", pady=(20, 15))
@@ -133,6 +150,15 @@ class RodGUI:
 
         elif profile == "Sinusoid":
 
+            tk.Label(self.profile_frame, text="Amplitude [deg]").grid(
+                row=0, column=0, padx=10, pady=5)
+
+            self.sin_amp_var = tk.StringVar(value="90")
+
+            tk.Entry(self.profile_frame, textvariable=self.sin_amp_var,
+                     justify="center", width=12).grid(
+                row=0, column=1, padx=10, pady=5)
+
             tk.Label(self.profile_frame, text="Periods").grid(
                 row=1, column=0, padx=10, pady=5)
 
@@ -154,11 +180,14 @@ class RodGUI:
 
         if profile == "Helix":
             turns = float(self.turns_var.get())
-            s = np.linspace(0, 1, nseg - 1)
+            s = (np.arange(nseg - 1) + 0.5) / (nseg - 1)
             return turns * 2 * np.pi * s
 
         if profile == "Sinusoid":
-            return np.pi / 2 * np.ones(nseg - 1)
+            amp = float(self.sin_amp_var.get())
+            waves = float(self.sin_waves_var.get())
+            s = (np.arange(nseg - 1) + 0.5) / (nseg - 1)
+            return np.deg2rad(amp) * np.sin(2 * np.pi * waves * s)
 
         return np.zeros(nseg - 1)
 
