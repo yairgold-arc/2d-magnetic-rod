@@ -1,6 +1,7 @@
 from MagneticField2D import MagneticField2D
 from MagneticRod2D import MagneticRod2D
 from ToolTip import ToolTip
+from rodAnalysis import runFieldAngleScan, plotFieldAngleScan
 
 import tkinter as tk
 import numpy as np
@@ -17,7 +18,7 @@ class RodGUI:
 
         self.root = root
 
-        root.title("Magnetic Rod")
+        root.title("Magnetic segmented Rod simulator")
         root.configure(padx=20, pady=20)
 
         label_font = ("Arial", 14)
@@ -39,17 +40,16 @@ class RodGUI:
 
         nseg_label = tk.Label(root, text="Num. Seg.", font=label_font)
         nseg_label.grid(row=2, column=0, sticky="w", padx=10, pady=5)
-        ToolTip(nseg_label,
-                "Number of rod segments.\nHigher values improve accuracy but increase solve time.")
+        ToolTip(nseg_label, "Number of rod segments.")
 
-        self.nseg_var = tk.StringVar(value="31")
+        self.nseg_var = tk.StringVar(value="11")
         tk.Entry(root, textvariable=self.nseg_var, font=entry_font,
                  justify="center", width=12).grid(row=2, column=1, padx=10, pady=5)
 
         ei_label = tk.Label(root, text="E x I [N·m²]", font=label_font)
         ei_label.grid(row=3, column=0, sticky="w", padx=10, pady=5)
         ToolTip(ei_label,
-                "Rod bending stiffness.\nLarger values produce a stiffer rod.")
+                "Rod bending stiffness.\nE - Young's modulus, I - second moment of area.")
 
         self.ei_var = tk.StringVar(value="1e-6")
         tk.Entry(root, textvariable=self.ei_var, font=entry_font,
@@ -58,7 +58,7 @@ class RodGUI:
         area_label = tk.Label(root, text="Area [m²]", font=label_font)
         area_label.grid(row=4, column=0, sticky="w", padx=10, pady=5)
         ToolTip(area_label,
-                "Cross-sectional area.\nUsed when calculating magnetic energy.")
+                "Cross-sectional area of the rod")
 
         self.area_var = tk.StringVar(value="1e-6")
         tk.Entry(root, textvariable=self.area_var, font=entry_font,
@@ -67,7 +67,7 @@ class RodGUI:
         mag_label = tk.Label(root, text="Magnetization [A/m]", font=label_font)
         mag_label.grid(row=5, column=0, sticky="w", padx=10, pady=5)
         ToolTip(mag_label,
-                "Magnetization amplitude M.\nFor sinusoidal profiles this is the peak value.")
+                "Magnetization amplitude M.")
 
         self.mag_var = tk.StringVar(value="1e5")
         tk.Entry(root, textvariable=self.mag_var, font=entry_font,
@@ -80,7 +80,7 @@ class RodGUI:
         bx_label = tk.Label(root, text="Bx [T]", font=label_font)
         bx_label.grid(row=7, column=0, sticky="w", padx=10, pady=5)
         ToolTip(bx_label,
-                "Magnetic field X component in Tesla.")
+                "Magnetic field x dir.")
 
         self.bx_var = tk.StringVar(value="0.01")
         tk.Entry(root, textvariable=self.bx_var, font=entry_font,
@@ -89,7 +89,7 @@ class RodGUI:
         by_label = tk.Label(root, text="By [T]", font=label_font)
         by_label.grid(row=8, column=0, sticky="w", padx=10, pady=5)
         ToolTip(by_label,
-                "Magnetic field Y component in Tesla.")
+                "Magnetic field y dir.")
 
         self.by_var = tk.StringVar(value="0.01")
         tk.Entry(root, textvariable=self.by_var, font=entry_font,
@@ -99,7 +99,11 @@ class RodGUI:
             row=9, column=0, columnspan=2, sticky="w", pady=(20, 15))
 
         self.profile_var = tk.StringVar(value="Fixed")
-        tk.OptionMenu(root, self.profile_var, "Fixed", "Alternating", "Helix", 'Sinusoid').grid(
+        profile_menu = tk.OptionMenu(
+            root, self.profile_var, "Fixed", "Alternating", "Helix", "Sinusoid")
+        profile_menu.config(font=entry_font)
+        profile_menu["menu"].config(font=entry_font)
+        profile_menu.grid(
             row=10, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
 
         self.profile_frame = tk.Frame(root)
@@ -108,10 +112,16 @@ class RodGUI:
         self.profile_var.trace_add("write", self.update_profile_parameters)
         self.update_profile_parameters()
 
-        tk.Button(root, text="Solve", font=button_font, bg="lightblue", width=15,
-                  height=2, command=self.solve).grid(row=12, column=0, columnspan=2, pady=25)
+        tk.Button(root, text="Equalibrium config.", font=button_font, bg="lightblue", width=16,
+                  height=2, command=self.solve).grid(row=12, column=0, columnspan=2, pady=10)
+
+        tk.Button(root, text="B0 Scan", font=button_font, bg="lightblue", width=16,
+                  height=2, command=self.runB0Scan).grid(row=13, column=0, columnspan=2, pady=10)
 
     def update_profile_parameters(self, *args):
+
+        profile_label_font = ("Arial", 14)
+        profile_entry_font = ("Arial", 14)
 
         for widget in self.profile_frame.winfo_children():
             widget.destroy()
@@ -119,52 +129,62 @@ class RodGUI:
         profile = self.profile_var.get()
 
         if profile == "Fixed":
-            tk.Label(self.profile_frame, text="Angle [deg]").grid(
+            tk.Label(self.profile_frame, text="Angle [deg]",
+                     font=profile_label_font).grid(
                 row=0, column=0, padx=10, pady=5)
 
             self.angle_var = tk.StringVar(value="0")
 
             tk.Entry(self.profile_frame, textvariable=self.angle_var,
+                     font=profile_entry_font,
                      justify="center", width=12).grid(
                          row=0, column=1, padx=10, pady=5)
 
         elif profile == "Alternating":
-            tk.Label(self.profile_frame, text="Amplitude [deg]").grid(
+            tk.Label(self.profile_frame, text="Amplitude [deg]",
+                     font=profile_label_font).grid(
                 row=0, column=0, padx=10, pady=5)
 
             self.alt_amp_var = tk.StringVar(value="90")
 
             tk.Entry(self.profile_frame, textvariable=self.alt_amp_var,
+                     font=profile_entry_font,
                      justify="center", width=12).grid(
                          row=0, column=1, padx=10, pady=5)
 
         elif profile == "Helix":
-            tk.Label(self.profile_frame, text="Turns").grid(
+            tk.Label(self.profile_frame, text="Turns",
+                     font=profile_label_font).grid(
                 row=0, column=0, padx=10, pady=5)
 
             self.turns_var = tk.StringVar(value="4")
 
             tk.Entry(self.profile_frame, textvariable=self.turns_var,
+                     font=profile_entry_font,
                      justify="center", width=12).grid(
                          row=0, column=1, padx=10, pady=5)
 
         elif profile == "Sinusoid":
 
-            tk.Label(self.profile_frame, text="Amplitude [deg]").grid(
+            tk.Label(self.profile_frame, text="Amplitude [deg]",
+                     font=profile_label_font).grid(
                 row=0, column=0, padx=10, pady=5)
 
             self.sin_amp_var = tk.StringVar(value="90")
 
             tk.Entry(self.profile_frame, textvariable=self.sin_amp_var,
+                     font=profile_entry_font,
                      justify="center", width=12).grid(
                 row=0, column=1, padx=10, pady=5)
 
-            tk.Label(self.profile_frame, text="Periods").grid(
+            tk.Label(self.profile_frame, text="Periods",
+                     font=profile_label_font).grid(
                 row=1, column=0, padx=10, pady=5)
 
             self.sin_waves_var = tk.StringVar(value="1")
 
             tk.Entry(self.profile_frame, textvariable=self.sin_waves_var,
+                     font=profile_entry_font,
                      justify="center", width=12).grid(
                 row=1, column=1, padx=10, pady=5)
 
@@ -227,6 +247,40 @@ class RodGUI:
 
         rod.plot(field=field, theta_initial=theta0)
 
+        plt.show()
+
+    def runB0Scan(self):
+
+        length = float(self.length_var.get())
+        nseg = int(self.nseg_var.get())
+        ei = float(self.ei_var.get())
+        area = float(self.area_var.get())
+        magnetization = float(self.mag_var.get())
+
+        bx = float(self.bx_var.get())
+        by = float(self.by_var.get())
+        profile = self.profile_var.get()
+
+        rod = MagneticRod2D(length=length, nseg=nseg, EI=ei,
+                            area=area, magnetization=magnetization)
+        rod.alpha0[:] = self.build_alpha(profile, nseg)
+
+        if profile == "Sinusoid":
+            periods = float(self.sin_waves_var.get())
+            s = (np.arange(nseg - 1) + 0.5) / (nseg - 1)
+            rod.M[:] = magnetization * np.sin(2 * np.pi * periods * s)
+
+        field = MagneticField2D(B0=np.array([bx, by]))
+        theta_initial = rod.state.theta.copy()
+
+        results = runFieldAngleScan(
+            rod,
+            field,
+            B0=float(np.hypot(bx, by)),
+            theta_initial=theta_initial
+        )
+
+        plotFieldAngleScan(results)
         plt.show()
 
 
