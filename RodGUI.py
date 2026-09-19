@@ -4,6 +4,9 @@ from ToolTip import ToolTip
 from rodAnalysis import runFieldAngleScan, plotFieldAngleScan
 
 import tkinter as tk
+from tkinter import ttk
+import queue
+import threading
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -251,6 +254,16 @@ class RodGUI:
 
     def runB0Scan(self):
 
+        progressWin = tk.Toplevel(self.root)
+        progressWin.title("B0 Scan")
+        progressWin.geometry("300x80")
+
+        tk.Label(progressWin, text="Running field angle scan...").pack(pady=5)
+
+        progressBar = ttk.Progressbar(
+            progressWin, length=250, mode="determinate")
+        progressBar.pack(pady=5)
+
         length = float(self.length_var.get())
         nseg = int(self.nseg_var.get())
         ei = float(self.ei_var.get())
@@ -273,15 +286,45 @@ class RodGUI:
         field = MagneticField2D(B0=np.array([bx, by]))
         theta_initial = rod.state.theta.copy()
 
-        results = runFieldAngleScan(
-            rod,
-            field,
-            B0=float(np.hypot(bx, by)),
-            theta_initial=theta_initial
-        )
+        progressBar.configure(maximum=72, value=0)
+        progress_queue = queue.Queue()
 
-        plotFieldAngleScan(results)
-        plt.show()
+        def run_scan():
+            try:
+                results = runFieldAngleScan(
+                    rod,
+                    field,
+                    B0=float(np.hypot(bx, by)),
+                    theta_initial=theta_initial,
+                    progress_callback=lambda current, total: progress_queue.put(
+                        ("progress", current, total)
+                    )
+                )
+                progress_queue.put(("done", results))
+            except Exception as error:
+                progress_queue.put(("error", error))
+
+        threading.Thread(target=run_scan, daemon=True).start()
+        self._poll_scan_progress(progress_queue, progressWin, progressBar)
+
+    def _poll_scan_progress(self, progress_queue, progressWin, progressBar):
+        try:
+            while True:
+                message = progress_queue.get_nowait()
+                if message[0] == "progress":
+                    _, current, total = message
+                    progressBar.configure(maximum=total, value=current)
+                elif message[0] == "done":
+                    progressWin.destroy()
+                    plotFieldAngleScan(message[1])
+                    plt.show()
+                    return
+                elif message[0] == "error":
+                    progressWin.destroy()
+                    raise message[1]
+        except queue.Empty:
+            self.root.after(50, self._poll_scan_progress,
+                            progress_queue, progressWin, progressBar)
 
 
 if __name__ == "__main__":
