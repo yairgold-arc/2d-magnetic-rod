@@ -35,12 +35,6 @@ The equilibrium configuration is obtained by minimizing the total rod energy
 
 ![Total rod energy formulation](images/TotalEnergy.png)
 
-where
-
-The total energy is shown in the equation image above:
-
-`U(θ) = 1/2 Σᵢ (EIᵢ/ds)(θᵢ₊₁ − θᵢ)² − Σᵢ A Mᵢ ds Bᵢ cos(θᵢ + αᵢ − βᵢ)`
-
 The first term represents the elastic bending energy and penalizes curvature along the rod.
 
 The second term represents the magnetic potential energy and favors alignment between the local magnetization direction and the external magnetic field.
