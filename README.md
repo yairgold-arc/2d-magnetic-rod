@@ -37,18 +37,9 @@ The equilibrium configuration is obtained by minimizing the total rod energy
 
 where
 
-$$
-U(\theta)
-=
-\frac{1}{2}
-\sum_i
-\frac{EI_i}{ds}
-(\theta_{i+1}-\theta_i)^2
--
-\sum_i
-A M_i ds B_i
-\cos(\theta_i+\alpha_i-\beta_i)
-$$
+The total energy is shown in the equation image above:
+
+`U(θ) = 1/2 Σᵢ (EIᵢ/ds)(θᵢ₊₁ − θᵢ)² − Σᵢ A Mᵢ ds Bᵢ cos(θᵢ + αᵢ − βᵢ)`
 
 The first term represents the elastic bending energy and penalizes curvature along the rod.
 
@@ -58,16 +49,16 @@ The second term represents the magnetic potential energy and favors alignment be
 
 | Symbol | Description |
 |----------|-------------|
-| \(U\) | Total energy |
-| \(\theta_i\) | Orientation of segment *i* |
-| \(EI_i\) | Bending stiffness of segment *i* |
-| \(ds\) | Segment length |
-| \(A\) | Rod cross-sectional area |
-| \(M_i\) | Magnetization magnitude of segment *i* |
-| \(B_i\) | Magnetic field magnitude at segment *i* |
-| \(\alpha_i\) | Programmed magnetization angle relative to the local rod frame |
-| \(\beta_i\) | Magnetic field direction |
-| \(i\) | Segment index |
+| U | Total energy |
+| θᵢ | Orientation of segment *i* |
+| EIᵢ | Bending stiffness of segment *i* |
+| ds | Segment length |
+| A | Rod cross-sectional area |
+| Mᵢ | Magnetization magnitude of segment *i* |
+| Bᵢ | Magnetic field magnitude at segment *i* |
+| αᵢ | Programmed magnetization angle relative to the local rod frame |
+| βᵢ | Magnetic field direction |
+| i | Segment index |
 
 ### Optimization
 
