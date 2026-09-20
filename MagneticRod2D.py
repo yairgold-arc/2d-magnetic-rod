@@ -265,8 +265,6 @@ class MagneticRod2D:
         self.state.theta[0] = self.theta_base
         self.state.theta[1:] = result.x
 
-        return result
-
         # Store final solution
 
         self.state.theta[0] = self.theta_base

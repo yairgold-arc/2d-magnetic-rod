@@ -1,3 +1,5 @@
+from tkinter import messagebox
+
 from MagneticField2D import MagneticField2D
 from MagneticRod2D import MagneticRod2D
 from ToolTip import ToolTip
@@ -11,7 +13,6 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-
 matplotlib.use("TkAgg")
 
 
@@ -21,7 +22,7 @@ class RodGUI:
 
         self.root = root
 
-        root.title("Magnetic segmented Rod simulator")
+        root.title("2D Magnetic Rod simulator")
         root.configure(padx=20, pady=20)
 
         label_font = ("Arial", 14)
@@ -83,7 +84,7 @@ class RodGUI:
         bx_label = tk.Label(root, text="Bx [T]", font=label_font)
         bx_label.grid(row=7, column=0, sticky="w", padx=10, pady=5)
         ToolTip(bx_label,
-                "Magnetic field x dir.")
+                "Magnetic field x-dir.")
 
         self.bx_var = tk.StringVar(value="0.01")
         tk.Entry(root, textvariable=self.bx_var, font=entry_font,
@@ -92,7 +93,7 @@ class RodGUI:
         by_label = tk.Label(root, text="By [T]", font=label_font)
         by_label.grid(row=8, column=0, sticky="w", padx=10, pady=5)
         ToolTip(by_label,
-                "Magnetic field y dir.")
+                "Magnetic field y-dir.")
 
         self.by_var = tk.StringVar(value="0.01")
         tk.Entry(root, textvariable=self.by_var, font=entry_font,
@@ -115,7 +116,7 @@ class RodGUI:
         self.profile_var.trace_add("write", self.update_profile_parameters)
         self.update_profile_parameters()
 
-        tk.Button(root, text="Equalibrium config.", font=button_font, bg="lightblue", width=16,
+        tk.Button(root, text="Equilibrium config.", font=button_font, bg="lightblue", width=16,
                   height=2, command=self.solve).grid(row=12, column=0, columnspan=2, pady=10)
 
         tk.Button(root, text="B0 Scan", font=button_font, bg="lightblue", width=16,
@@ -215,15 +216,30 @@ class RodGUI:
         return np.zeros(nseg - 1)
 
     def solve(self):
+        try:
+            length = float(self.length_var.get())
+            nseg = int(self.nseg_var.get())
+            ei = float(self.ei_var.get())
+            area = float(self.area_var.get())
+            magnetization = float(self.mag_var.get())
+            bx = float(self.bx_var.get())
+            by = float(self.by_var.get())
 
-        length = float(self.length_var.get())
-        nseg = int(self.nseg_var.get())
-        ei = float(self.ei_var.get())
-        area = float(self.area_var.get())
-        magnetization = float(self.mag_var.get())
+            if length <= 0:
+                raise ValueError("Length must be positive.")
 
-        bx = float(self.bx_var.get())
-        by = float(self.by_var.get())
+            if nseg < 3:
+                raise ValueError("Number of segments must be at least 3.")
+
+            if ei <= 0:
+                raise ValueError("EI must be positive.")
+
+            if area <= 0:
+                raise ValueError("Area must be positive.")
+
+        except Exception as e:
+            messagebox.showerror("Invalid Input", str(e))
+            return
 
         profile = self.profile_var.get()
 
@@ -258,7 +274,7 @@ class RodGUI:
         progressWin.title("B0 Scan")
         progressWin.geometry("300x80")
 
-        tk.Label(progressWin, text="Running field angle scan...").pack(pady=5)
+        tk.Label(progressWin, text="Running B0 field angle scan...").pack(pady=5)
 
         progressBar = ttk.Progressbar(
             progressWin, length=250, mode="determinate")
