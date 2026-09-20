@@ -29,6 +29,61 @@ Current implementation:
 
 ---
 
+## Energy Formulation and Optimization
+
+The equilibrium configuration is obtained by minimizing the total rod energy
+
+![Total rod energy formulation](images/TotalEnergy.png)
+
+where
+
+$$
+U(\theta)
+=
+\frac{1}{2}
+\sum_i
+\frac{EI_i}{ds}
+(\theta_{i+1}-\theta_i)^2
+-
+\sum_i
+A M_i ds B_i
+\cos(\theta_i+\alpha_i-\beta_i)
+$$
+
+The first term represents the elastic bending energy and penalizes curvature along the rod.
+
+The second term represents the magnetic potential energy and favors alignment between the local magnetization direction and the external magnetic field.
+
+### Variables
+
+| Symbol | Description |
+|----------|-------------|
+| \(U\) | Total energy |
+| \(\theta_i\) | Orientation of segment *i* |
+| \(EI_i\) | Bending stiffness of segment *i* |
+| \(ds\) | Segment length |
+| \(A\) | Rod cross-sectional area |
+| \(M_i\) | Magnetization magnitude of segment *i* |
+| \(B_i\) | Magnetic field magnitude at segment *i* |
+| \(\alpha_i\) | Programmed magnetization angle relative to the local rod frame |
+| \(\beta_i\) | Magnetic field direction |
+| \(i\) | Segment index |
+
+### Optimization
+
+The base orientation is fixed (clamped boundary condition), and the remaining segment angles are treated as optimization variables.
+
+The equilibrium configuration is computed by minimizing the total energy with the **BFGS (Broyden-Fletcher-Goldfarb-Shanno)** algorithm implemented in SciPy:
+
+```python
+scipy.optimize.minimize(
+    objective,
+    theta_free_initial,
+    method="BFGS"
+)
+```
+
+
 ## Usage
 
 The simulator can be operated in two ways.
