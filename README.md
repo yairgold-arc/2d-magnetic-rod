@@ -5,7 +5,6 @@ A Python simulator for 2D segmented magnetic rods subjected to external magnetic
 The simulator combines a graphical user interface for interactive exploration with analysis tools for systematic magnetic field sweeps.
 
 images/guiPlusConfig.png
-
 *Figure 1. Interactive GUI for configuring rod properties, magnetization profiles, and magnetic fields.*
 
 The rod is modeled as a chain of inextensible elastic segments with programmed magnetization. Given an external magnetic field, the static equilibrium configuration is obtained by minimizing the total energy, which consists of elastic bending energy and magnetic energy.
