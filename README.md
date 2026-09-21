@@ -35,9 +35,7 @@ The equilibrium configuration is obtained by minimizing the total rod energy
 
 ![Total rod energy formulation](images/TotalEnergy.png)
 
-The first term represents the elastic bending energy and penalizes curvature along the rod.
-
-The second term represents the magnetic potential energy and favors alignment between the local magnetization direction and the external magnetic field.
+The first term represents the elastic bending energy and penalizes curvature along the rod. The second term represents the magnetic potential energy and favors alignment between the local magnetization direction and the external magnetic field.
 
 ### Variables
 
@@ -56,16 +54,10 @@ The second term represents the magnetic potential energy and favors alignment be
 
 ### Optimization
 
-The base orientation is fixed (clamped boundary condition), and the remaining segment angles are treated as optimization variables.
-
-The equilibrium configuration is computed by minimizing the total energy with the **BFGS (Broyden-Fletcher-Goldfarb-Shanno)** algorithm implemented in SciPy:
+The base orientation is fixed (clamped boundary condition), and the remaining segment angles are treated as optimization variables. The equilibrium configuration is computed by minimizing the total energy with the **BFGS (Broyden-Fletcher-Goldfarb-Shanno)** algorithm implemented in SciPy:
 
 ```python
-scipy.optimize.minimize(
-    objective,
-    theta_free_initial,
-    method="BFGS"
-)
+scipy.optimize.minimize(objective,theta_free_initial,method="BFGS")
 ```
 
 
