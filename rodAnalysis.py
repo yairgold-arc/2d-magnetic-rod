@@ -179,11 +179,15 @@ def plotFieldAngleScan(results):
         mx = np.cos(alpha0[i])
         my = np.sin(alpha0[i])
 
+        Mscale = M[i]
+        if np.max(np.abs(M)) > 0:
+            Mscale /= np.max(np.abs(M))
+
         ax[0, 0].arrow(
             xc,
             yc,
-            arrowScale * mx,
-            arrowScale * my,
+            arrowScale * Mscale * mx,
+            arrowScale * Mscale * my,
             color="red",
             width=0.0002,
             head_width=0.003,
@@ -247,9 +251,9 @@ def plotFieldAngleScan(results):
     ax[0, 1].set_xlabel("Field Angle [deg]")
     ax[0, 1].set_ylabel("Tip Angle [deg]")
 
-   # ==========================================================
-# Reachable Direction Histogram
-# ==========================================================
+    # ==========================================================
+    # Reachable Direction Histogram
+    # ==========================================================
 
     bins = np.arange(-180, 181, 5)
 
@@ -268,9 +272,9 @@ def plotFieldAngleScan(results):
     ax[1, 0].set_xlim(-180, 180)
     ax[1, 0].set_xticks(np.arange(-180, 181, 20))
 
-# ==========================================================
-# Energies
-# ==========================================================
+    # ==========================================================
+    # Energies
+    # ==========================================================
 
     ax[1, 1].plot(
         fieldAngles,
