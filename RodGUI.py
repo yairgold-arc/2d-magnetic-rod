@@ -12,6 +12,7 @@ import threading
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import traceback
 
 matplotlib.use("TkAgg")
 
@@ -316,7 +317,7 @@ class RodGUI:
                 )
                 progress_queue.put(("done", results))
             except Exception as error:
-                progress_queue.put(("error", error))
+                progress_queue.put(("error", error, traceback.format_exc()))
 
         threading.Thread(target=run_scan, daemon=True).start()
         self._poll_scan_progress(progress_queue, progressWin, progressBar)
@@ -335,6 +336,7 @@ class RodGUI:
                     return
                 elif message[0] == "error":
                     progressWin.destroy()
+                    print(message[2])
                     raise message[1]
         except queue.Empty:
             self.root.after(50, self._poll_scan_progress,
