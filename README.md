@@ -31,7 +31,7 @@ Current implementation:
 
 ## Energy Formulation and Optimization
 
-The equilibrium configuration is obtained by minimizing the total rod energy
+The equilibrium configuration is obtained by minimizing the total rod energy:
 
 ![Total rod energy formulation](images/TotalEnergy.png)
 

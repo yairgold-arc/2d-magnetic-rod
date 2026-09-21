@@ -170,7 +170,7 @@ class RodGUI:
 
         elif profile == "Sinusoid":
 
-            tk.Label(self.profile_frame, text="Amplitude [deg]",
+            tk.Label(self.profile_frame, text="Angle [deg]",
                      font=profile_label_font).grid(
                 row=0, column=0, padx=10, pady=5)
 
@@ -208,10 +208,8 @@ class RodGUI:
             return turns * 2 * np.pi * s
 
         if profile == "Sinusoid":
-            amp = float(self.sin_amp_var.get())
-            waves = float(self.sin_waves_var.get())
-            s = (np.arange(nseg - 1) + 0.5) / (nseg - 1)
-            return np.deg2rad(amp) * np.sin(2 * np.pi * waves * s)
+            angle = float(self.sin_amp_var.get())
+            return np.deg2rad(angle) * np.ones(nseg - 1)
 
         return np.zeros(nseg - 1)
 
