@@ -23,9 +23,10 @@ Current implementation:
 - Static equilibrium
 - Clamped base
 - Prescribed magnetization
-- No dynamics
+- No (actual) dynamics
 - No self-contact
 - No dipole-dipole interactions
+- No gradient magnetic field
 
 ---
 
