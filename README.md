@@ -188,8 +188,8 @@ pip install -r requirements.txt
 Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd MagneticRod2D
+git clone https://github.com/yairgold-arc/2d-magnetic-rod.git
+cd 2d-magnetic-rod
 ```
 
 Launch the GUI:
