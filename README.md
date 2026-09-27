@@ -1,12 +1,15 @@
 # MagneticRod2D
 
 A Python simulator for 2D segmented magnetic rods subjected to external magnetic fields.
-
 The simulator combines a graphical user interface for interactive exploration with analysis tools for systematic magnetic field sweeps.
 
 ![Magnetic rod simulator GUI](images/guiPlusConfig.png)
 
 *Figure 1. Interactive GUI for configuring rod properties, magnetization profiles, and magnetic fields.*
+
+![Magnetic rod simulator GUI](images/TotalEnergy.png)
+
+*Figure 2. Interactive GUI for configuring rod properties, magnetization profiles, and magnetic fields.*
 
 The rod is modeled as a chain of inextensible elastic segments with programmed magnetization. Given an external magnetic field, the static equilibrium configuration is obtained by minimizing the total energy, which consists of elastic bending energy and magnetic energy.
 
@@ -33,7 +36,6 @@ Current implementation:
 ## Energy Formulation and Optimization
 
 The equilibrium configuration is obtained by minimizing the total rod energy:
-
 ![Total rod energy formulation](images/TotalEnergy.png)
 
 The first term represents the elastic bending energy and penalizes curvature along the rod. The second term represents the magnetic potential energy and favors alignment between the local magnetization direction and the external magnetic field.
@@ -44,7 +46,7 @@ The first term represents the elastic bending energy and penalizes curvature alo
 |----------|-------------|
 | U | Total energy |
 | θᵢ | Orientation of segment *i* |
-| EIᵢ | Bending stiffness of segment *i* |
+| E x Iᵢ | Bending stiffness of segment *i* |
 | ds | Segment length |
 | A | Rod cross-sectional area |
 | Mᵢ | Magnetization magnitude of segment *i* |
