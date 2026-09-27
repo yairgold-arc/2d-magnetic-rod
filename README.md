@@ -14,7 +14,7 @@ The simulator combines a graphical user interface for interactive exploration wi
 
 *Figure 2. Magnetic Field rotational scan result.*
 
-
+---
 
 
 The rod is modeled as a chain of inextensible elastic segments with programmed magnetization. Given an external magnetic field, the static equilibrium configuration is obtained by minimizing the total energy, which consists of elastic bending energy and magnetic energy.
